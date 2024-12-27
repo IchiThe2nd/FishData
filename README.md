@@ -12,4 +12,9 @@ objective: easily accessible & configurable charting of Diva's chemistry. built 
 8. graph all of it.
 9. app or web app for phone access
 10. notifications system?
-11. 
+
+11.
+xml pull date = yymmdd&length of report
+http://192.168.1.2/cgi-bin/outlog.xml?sdate=241221&days=1 
+http://192.168.1.2/cgi-bin/datalog.xml?sdate=241221&days=1 
+http://192.168.1.2/cgi-bin/statuslog.xml?sdate=241221&days=1 
