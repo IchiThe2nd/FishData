@@ -1,16 +1,19 @@
 package main
 
 import (
+	"fmt"
 	"testing"
 )
 
 func TestProbes(t *testing.T) {
-	t.Run("Create a Probe and check a value", func(t *testing.T) {
-		want := "Diva"
-		//input := `<Probe><hostname>Diva</hostname></Probe>`
-		//when
-		got := NewProbe(input)
 
+	t.Run("Create a Probe from further nested", func(t *testing.T) {
+		want := "Diva"
+		input := `This XML file does not appear to have any style information associated with it. The document tree is shown below.<status software="5.12_8H24" hardware="1.0">
+<hostname>Diva</hostname></status>`
+		//when
+		got := NewSystem(input)
+		fmt.Println(got.Hostname)
 		//then
 		if got.Hostname != want {
 			t.Errorf(" got %v wanted %v", got, want)

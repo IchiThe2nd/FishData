@@ -5,17 +5,17 @@ import (
 	"fmt"
 )
 
-const input = `<Probe><hostname>Diva</hostname></Probe>`
+const input = `<System\g><hostname>Diva</hostname></system>`
 
-type Probe struct {
+type System struct {
 	Hostname string `xml:"hostname"`
 }
 
-func NewProbe(input string) Probe {
-	var probe Probe
-	err := xml.Unmarshal([]byte(input), &probe)
+func NewSystem(input string) System {
+	var system System
+	err := xml.Unmarshal([]byte(input), &system)
 	if err != nil {
 		fmt.Println(err)
 	}
-	return probe
+	return system
 }
