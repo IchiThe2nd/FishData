@@ -1,24 +1,89 @@
 package main
 
 import (
-	"fmt"
+	"reflect"
 	"testing"
 )
 
 func TestProbes(t *testing.T) {
+	dummySystem := System{
+		Hostname: "Diva",
+		Serial:   "AC5:66625",
+		Timezone: "-8.00",
+		//	Date:    , need to verify format for time.Time 01/03/2025 10:55:5
+	}
 
-	t.Run("Create a Probe from further nested", func(t *testing.T) {
-		want := "Diva"
-		input := `This XML file does not appear to have any style information associated with it. The document tree is shown below.<status software="5.12_8H24" hardware="1.0">
-<hostname>Diva</hostname></status>`
+	goodInput := `This XML file does not appear to have any style information associated with it. The document tree is shown below.<status software="5.12_8H24" hardware="1.0"><hostname>Diva</hostname><serial>AC5:66625</serial><timezone>-8.00</timezone><date>01/03/2025 10:55:57</date></status>`
+
+	t.Run("Get everything and compare entire struct", func(t *testing.T) {
+		want := dummySystem
 		//when
-		got := NewSystem(input)
-		fmt.Println(got.Hostname)
+		system, _ := NewSystem(goodInput)
+		got := system
+		assertMatching(t, got, want)
+	})
+
+	t.Run("Get Hostname from input", func(t *testing.T) {
+		want := dummySystem.Hostname
+		//when
+		system, _ := NewSystem(goodInput)
+		got := system.Hostname
+		assertMatching(t, got, want)
+	})
+
+	t.Run("Get serial on input", func(t *testing.T) {
+		//Given good input (to reduce xml chunks)
+		want := "AC5:66625"
+		//when
+		system, _ := NewSystem(goodInput)
+		got := system.Serial
 		//then
-		if got.Hostname != want {
-			t.Errorf(" got %v wanted %v", got, want)
+		assertMatching(t, got, want)
+	})
+	t.Run("Get timezone on input", func(t *testing.T) {
+		//Given good input (to reduce xml chunks)
+		want := "-8.00"
+		//when
+		system, _ := NewSystem(goodInput)
+		got := system.Timezone
+		//then
+		assertMatching(t, got, want)
+	})
+
+	t.Run("Error if Hostname is blank", func(t *testing.T) {
+		badInput := `<status software="5.12_8H24" hardware="1.0">
+		<hostname></hostname><serial>AC5:66625</serial></status>`
+		system, err := NewSystem(badInput)
+		hostname := system.Hostname
+		if err == nil {
+			t.Errorf("did not recieve err on Null Hostname, hostname is %v", hostname)
 		}
 	})
+
+	t.Run("After input we expect Hostname to be a string", func(t *testing.T) {
+		//not sure how to make failing case and I dont think this adds anything right now
+		badInput := `<status software="5.12_8H24" hardware="1.0">
+	<hostname></hostname><serial>AC5:66625</serial></status>`
+		system, _ := NewSystem(badInput)
+		hostname := system.Hostname
+		var correctType string
+		if reflect.TypeOf(hostname) != reflect.TypeOf(correctType) {
+			t.Errorf("Hostname converted to not a string recieved %+v", reflect.TypeOf(hostname))
+		}
+	})
+}
+
+//	func assertMatching(t *testing.T, got string, want string) {
+//		t.Helper()
+//		if got != want {
+//			t.Errorf("got %v but wanted %v \n", got, want)
+//		}
+//	}
+func assertMatching(t *testing.T, got any, want any) {
+	t.Helper()
+	if got != want {
+		t.Errorf("got %v but wanted %v \n", got, want)
+	}
 }
 
 /*
@@ -40,13 +105,18 @@ S - Seperation
 // 		// Given
 
 // 		// When
-// 		// Then
+// 		// The//
+//
+//
+//
+//
+//
+//	n
 // 	}
 // }
 
 /*
-This XML file does not appear to have any style information associated with it. The document tree is shown below.
-<status software="5.12_8H24" hardware="1.0">
+borednuke@Fux:~/Clones/FishData$ go test
 <hostname>Diva</hostname>
 <serial>AC5:66625</serial>
 <timezone>-8.00</timezone>
