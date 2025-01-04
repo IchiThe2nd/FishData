@@ -1,19 +1,20 @@
 package main
 
 import (
-	"encoding/xml"
 	"testing"
 )
- input := `<Probe><hostname>Diva</hostname></Probe>`
 
 func TestProbes(t *testing.T) {
-	t.Run(" verify a probe has a value", func(t *testing.T) {
-		var probe Probe
+	t.Run("Create a Probe and check a value", func(t *testing.T) {
+		want := "Diva"
+		//input := `<Probe><hostname>Diva</hostname></Probe>`
+		//when
+		got := NewProbe(input)
 
-		err := xml.Unmarshal([]byte(input),&probe){
-			fmt.Println("error unmarsshlling XMl ",err)
+		//then
+		if got.Hostname != want {
+			t.Errorf(" got %v wanted %v", got, want)
 		}
-		return probe
 	})
 }
 
