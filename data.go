@@ -13,7 +13,15 @@ type System struct {
 	Serial   string `xml:"serial"`
 	Timezone string `xml:"timezone"`
 	RawDate  string `xml:"date"` //to do create importer for time.Time format directly through overiding the time.Time portion of unmarshal on System
-	Date     time.Time
+
+	Date   time.Time
+	Probes []Probe `xml:"probes>probe"`
+}
+
+type Probe struct {
+	Name  string  `xml:"name"`
+	Value float32 `xml:"value"`
+	Type  string  `xml:"type"`
 }
 
 func NewSystem(input string) (System, error) {
@@ -36,5 +44,6 @@ func NewSystem(input string) (System, error) {
 		fmt.Println(err)
 	}
 	system.Date = parseTime
+
 	return system, err
 }
