@@ -12,7 +12,7 @@ type System struct {
 	Hostname string `xml:"hostname"`
 	Serial   string `xml:"serial"`
 	Timezone string `xml:"timezone"`
-	RawDate  string `xml:"date"` //to do create importer for time.Time format directly through overiding the time.Time portion of unmarshal on System
+	RawDate  string `xml:"date"`
 
 	Date   time.Time
 	Probes []Probe `xml:"probes>probe"`
@@ -36,14 +36,15 @@ func NewSystem(input string) (System, error) {
 		return system, err
 	}
 
-	stringT := system.RawDate
-	pLayout := "01/02/2006 03:04:05" // The reference time, in numerical order.
-	parseTime, err := time.Parse(pLayout, stringT)
+	system.Date = convTime(system.RawDate, "01/02/2006 03:04:05")
+	return system, err
+}
+
+func convTime(input, layout string) time.Time {
+	adate, err := time.Parse(layout, input)
 
 	if err != nil {
 		fmt.Println(err)
 	}
-	system.Date = parseTime
-
-	return system, err
+	return adate
 }
