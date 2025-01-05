@@ -1,4 +1,10 @@
 # FishData
+As a neptune owner I want to vierwe longer term trends in paramters of the reef.
+Also want to include databeing genereated by non Neptune equipment 
+for analysis of system wide trends.
+This data should all be viewable from outside of the local network.
+
+
 First project
 objective: easily accessible & configurable charting of Diva's chemistry. built using go / tdd.
 
