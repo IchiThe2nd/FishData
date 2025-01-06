@@ -31,15 +31,7 @@ func TestProbes(t *testing.T) {
 	
 	
 	</probes></status>`
-	//Basic tests
-	//	t.Run("Get everything and compare entire struct", func(t *testing.T) {
-	//		want := dummySystem
-	//		//when
-	//		system, _ := NewSystem(goodInput)
-	//		got := system
-	//		assertMatching(t, got, want)
-	//	})
-	//
+
 	t.Run("Get Hostname string from input", func(t *testing.T) {
 		want := dummySystem.Hostname
 		//when
