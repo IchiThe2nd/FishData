@@ -28,6 +28,9 @@ func Test_Data_Store(t *testing.T) {
 			Readings: []Reading{
 				testReading1,
 			},
+			Names: []string{
+				"Temp",
+			},
 		}
 
 		lenOfStore := len(got.Readings)
@@ -55,13 +58,35 @@ func Test_Data_Store(t *testing.T) {
 		got := NewStore()
 		assertStore(t, got, store)
 	})
+	t.Run("Store has a list for probes being tracked", func(t *testing.T) {
+		//testReading1 := NewReading(time, "Temp", 10.0)
+		want := Store{
+			Names: []string{
+				"TrackedProbe",
+			},
+		}
+		got := NewStore()
+		got.AddTrackedNames("TrackedProbe")
+		assertStore(t, got, want)
+	})
+	t.Run("Adding a reading updates Names", func(t *testing.T) {
+		testReading1 := NewReading(time, "Temp", 10.0)
+		wantStore := Store{
+			Names: []string{
+				"Temp",
+			},
+		}
+		store := NewStore()
+		store.AddReading(testReading1)
+		got := store.Names[0]
+		want := wantStore.Names[0]
+		assertMatching(t, got, want)
+	})
 	t.Run("Prints out contents of a reading", func(t *testing.T) {
 		store := NewStore()
 		testReading1 := NewReading(time, "Temp", 10.0)
 		store.AddReading(testReading1)
 		buffer := &bytes.Buffer{}
-		//		testReading2 := NewReading(time, "Temp", 14.0)
-		//		store.AddReading(testReading2)
 
 		store.PrintReadings(buffer)
 		wantedString := []string{
@@ -72,15 +97,22 @@ func Test_Data_Store(t *testing.T) {
 		}
 		want := strings.Join(wantedString, "")
 		got := buffer.String()
-		//		fmt.Printf("\n Got string is %v\n", got)
-		//		fmt.Printf("\n want string is %v\n", want)
 		assertMatching(t, got, want)
-		//want := "10"
-		//assertMatching(t, got, want)
 	})
+	t.Run(" Printing from an empty store errors out", func(t *testing.T) {
+		store := NewStore()
+		out := &bytes.Buffer{}
+		err := store.PrintReadings(out)
+		if err == nil {
+			t.Error("Tried to print from empty Store")
+		}
+	})
+
+	// when given a "system" it should see if there is Probe with "Name" from slice of ((impklemnent this first)) names in the Store. If it finds it should create a reading and append to the store. if no names are found it should warn  data imported.
 }
 
 func assertStore(t *testing.T, got Store, want Store) {
+	t.Helper()
 	if !reflect.DeepEqual(got, want) {
 		t.Errorf("%v and %v do not reflect equal\n", got, want)
 	}
