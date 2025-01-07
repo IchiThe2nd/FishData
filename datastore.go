@@ -84,3 +84,15 @@ func (store Store) PrintReadings(out io.Writer) error {
 	}
 	return nil
 }
+
+func (store *Store) UpdateStore(scan System) (string, error) {
+	lookingName := store.Names[0]
+	for i, probeNames := range scan.Probes {
+		if lookingName == probeNames.Name {
+			fmt.Printf("found %v at scan.Probes[%v]", lookingName, i)
+			return lookingName, nil
+		}
+	}
+	fmt.Printf("\nlooking for %v\n", lookingName)
+	return "", nil
+}

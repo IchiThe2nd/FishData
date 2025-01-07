@@ -24,7 +24,7 @@ type Probe struct {
 	Type  string  `xml:"type"`
 }
 
-func NewSystem(input string) (System, error) {
+func NewSystem(input string) (System, error) { //this is prroabbly name wrong now change to newScan
 	var system System
 	err := xml.Unmarshal([]byte(input), &system)
 	if err != nil {
