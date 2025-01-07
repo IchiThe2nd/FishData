@@ -55,7 +55,7 @@ func (store *Store) AddTrackedNames(newName string) (*Store, error) {
 }
 
 func (store *Store) AddReading(reading Reading) *Store {
-	store.Names = append(store.Names, reading.Name)
+	store.AddTrackedNames(reading.Name)
 	store.Readings = append(store.Readings, reading)
 	return store
 }
