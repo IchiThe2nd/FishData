@@ -54,10 +54,20 @@ func (store *Store) AddTrackedNames(newName string) (Store, error) {
 	return *store, nil
 }
 
-func (store *Store) AddReading(reading Reading) *Store {
-	store.AddTrackedNames(reading.Name)
-	store.Readings = append(store.Readings, reading)
-	return store
+func (store *Store) AddReading(newReading Reading) Store {
+	store.AddTrackedNames(newReading.Name)
+
+	for _, oldReadings := range store.Readings {
+		if oldReadings.Time == newReading.Time {
+			return *store
+		} else {
+			store.Readings = append(store.Readings, newReading)
+		}
+		return *store
+	}
+
+	store.Readings = append(store.Readings, newReading)
+	return *store
 }
 
 func (store Store) PrintReadings(out io.Writer) error {
