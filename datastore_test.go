@@ -131,8 +131,8 @@ func Test_Data_Store(t *testing.T) {
 
 		// but i think  i want future calls to be like below.
 		// cStore, err := aStore.AddTrackedNames("bill") //this is more clear that we are updating the store and cheking an error.
-		_, err := aStore.AddTrackedNames("bill") //this is dumb but works
-		cStore := aStore
+		cStore, err := aStore.AddTrackedNames("bill") //this is dumb but works
+		//cStore := aStore
 		assertMatchingTypes(t, bStore, cStore)
 		if err != nil {
 			t.Error("recievd error when not expected")
