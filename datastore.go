@@ -34,7 +34,20 @@ func NewReading(t time.Time, name string, value float32) Reading {
 }
 
 func (store *Store) AddTrackedNames(newName string) *Store {
-	store.Names = append(store.Names, newName)
+	if len(store.Names) == 0 {
+		store.Names = append(store.Names, newName)
+	} else {
+		matchingNames := 0
+		for _, existingNames := range store.Names {
+			if existingNames == newName {
+				matchingNames++
+			}
+		}
+		if matchingNames == 0 {
+			store.Names = append(store.Names, newName)
+		}
+	}
+
 	return store
 }
 

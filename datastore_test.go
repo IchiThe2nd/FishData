@@ -8,10 +8,11 @@ import (
 	"time"
 )
 
-var aTime = time.Now()
-var testReading1 = NewReading(aTime, "Temp", 10.0)
-
 func Test_Data_Store(t *testing.T) {
+
+	var aTime = time.Now()
+	var testReading1 = NewReading(aTime, "Temp", 10.0)
+
 	t.Run("creates a reading", func(t *testing.T) {
 		want := testReading1
 		//when
@@ -40,7 +41,6 @@ func Test_Data_Store(t *testing.T) {
 	})
 	t.Run("Retains valid data after attaching a reading", func(t *testing.T) {
 
-		testReading1 := NewReading(aTime, "Temp", 10.0)
 		testReading2 := NewReading(aTime, "Temp", 20.0)
 		store := NewStore()
 		store.AddReading(testReading1)
@@ -50,8 +50,7 @@ func Test_Data_Store(t *testing.T) {
 
 		assertMatching(t, got, want)
 	})
-	t.Run("Creates a store ", func(t *testing.T) {
-		//testReading1 := NewReading(time, "Temp", 10.0)
+	t.Run("Creator Creates a store ", func(t *testing.T) {
 		store := Store{}
 		got := NewStore()
 		assertStore(t, got, store)
@@ -63,12 +62,13 @@ func Test_Data_Store(t *testing.T) {
 				"TrackedProbe",
 			},
 		}
-		got := NewStore()
-		got.AddTrackedNames("TrackedProbe")
+		aStore := NewStore()
+		aStore.AddTrackedNames("TrackedProbe")
+		got := aStore
+		//		fmt.Println(aStore.Names)
 		assertStore(t, got, want)
 	})
 	t.Run("Adding a reading updates Names", func(t *testing.T) {
-		testReading1 := NewReading(aTime, "Temp", 10.0)
 		wantStore := Store{
 			Names: []string{
 				"Temp",
@@ -80,9 +80,21 @@ func Test_Data_Store(t *testing.T) {
 		want := wantStore.Names[0]
 		assertMatching(t, got, want)
 	})
+
+	t.Run("Exisiting trackedNames do not create addition entries", func(t *testing.T) {
+		aStore := NewStore()
+		aStore.AddTrackedNames("aName")
+		aStore.AddTrackedNames("bName")
+		before := len(aStore.Names)
+		aStore.AddTrackedNames("aName")
+		after := len(aStore.Names)
+
+		if before != after {
+			t.Errorf("starting store length was %v and after adding an existing name store length was %v", before, after)
+		}
+	})
 	t.Run("Prints out contents of a reading", func(t *testing.T) {
 		store := NewStore()
-		testReading1 := NewReading(aTime, "Temp", 10.0)
 		store.AddReading(testReading1)
 		buffer := &bytes.Buffer{}
 
