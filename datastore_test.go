@@ -80,18 +80,23 @@ func Test_Data_Store(t *testing.T) {
 		want := wantStore.Names[0]
 		assertMatching(t, got, want)
 	})
-
+	// turn this inot table test.. test adding "" ,
 	t.Run("Exisiting trackedNames do not create addition entries", func(t *testing.T) {
 		aStore := NewStore()
 		aStore.AddTrackedNames("aName")
 		aStore.AddTrackedNames("bName")
 		before := len(aStore.Names)
-		aStore.AddTrackedNames("aName")
+		_, err := aStore.AddTrackedNames("aName")
+		if err == nil {
+			t.Errorf(" should have recived error on adding a duplicated name")
+			//fmt.Print(err)
+		}
 		after := len(aStore.Names)
 
 		if before != after {
 			t.Errorf("starting store length was %v and after adding an existing name store length was %v", before, after)
 		}
+
 	})
 	t.Run("Prints out contents of a reading", func(t *testing.T) {
 		store := NewStore()
@@ -117,7 +122,23 @@ func Test_Data_Store(t *testing.T) {
 			t.Error("Tried to print from empty Store")
 		}
 	})
+	t.Run("updating a storeupdates and returns the store and an err:", func(t *testing.T) {
+		aStore := NewStore()
+		aStore.AddTrackedNames("bob") // error return completely ignored.
 
+		bStore := aStore
+		assertMatchingTypes(t, aStore, bStore)
+
+		// but i think  i want future calls to be like below.
+		// cStore, err := aStore.AddTrackedNames("bill") //this is more clear that we are updating the store and cheking an error.
+		_, err := aStore.AddTrackedNames("bill") //this is dumb but works
+		cStore := aStore
+		assertMatchingTypes(t, bStore, cStore)
+		if err != nil {
+			t.Error("recievd error when not expected")
+		}
+
+	})
 	//NEXT TEST when given a "system" it should see if there is Probe with "Name" from slice of ((impklemnent this first)) names in the Store. If it finds it should create a reading and append to the store. if no names are found it should warn  data imported.
 }
 

@@ -33,7 +33,8 @@ func NewReading(t time.Time, name string, value float32) Reading {
 	return reading
 }
 
-func (store *Store) AddTrackedNames(newName string) *Store {
+func (store *Store) AddTrackedNames(newName string) (*Store, error) {
+	//  cant figure out why I have to return as a pointer with out breasking stuff
 	if len(store.Names) == 0 {
 		store.Names = append(store.Names, newName)
 	} else {
@@ -41,6 +42,8 @@ func (store *Store) AddTrackedNames(newName string) *Store {
 		for _, existingNames := range store.Names {
 			if existingNames == newName {
 				matchingNames++
+				err := errors.New("entry already exists")
+				return store, err
 			}
 		}
 		if matchingNames == 0 {
@@ -48,7 +51,7 @@ func (store *Store) AddTrackedNames(newName string) *Store {
 		}
 	}
 
-	return store
+	return store, nil
 }
 
 func (store *Store) AddReading(reading Reading) *Store {
