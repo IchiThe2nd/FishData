@@ -8,20 +8,18 @@ import (
 	"time"
 )
 
+var aTime = time.Now()
+var testReading1 = NewReading(aTime, "Temp", 10.0)
+
 func Test_Data_Store(t *testing.T) {
-	time := time.Now() //testing time
 	t.Run("creates a reading", func(t *testing.T) {
-		want := Reading{
-			Time:  time,
-			Name:  "Temp",
-			Value: 5.0,
-		}
+		want := testReading1
 		//when
-		got := NewReading(time, "Temp", 5.0)
+		got := NewReading(aTime, "Temp", 10.0)
 		assertMatching(t, got, want)
 	})
 	t.Run("attaches a reading to a store with data", func(t *testing.T) {
-		testReading1 := NewReading(time, "Temp", 10.0)
+		//	testReading1 := NewReading(time, "Temp", 10.0)
 		got := NewStore()
 		got.AddReading(testReading1)
 		want := Store{
@@ -42,8 +40,8 @@ func Test_Data_Store(t *testing.T) {
 	})
 	t.Run("Retains valid data after attaching a reading", func(t *testing.T) {
 
-		testReading1 := NewReading(time, "Temp", 10.0)
-		testReading2 := NewReading(time, "Temp", 20.0)
+		testReading1 := NewReading(aTime, "Temp", 10.0)
+		testReading2 := NewReading(aTime, "Temp", 20.0)
 		store := NewStore()
 		store.AddReading(testReading1)
 		store.AddReading(testReading2)
@@ -70,7 +68,7 @@ func Test_Data_Store(t *testing.T) {
 		assertStore(t, got, want)
 	})
 	t.Run("Adding a reading updates Names", func(t *testing.T) {
-		testReading1 := NewReading(time, "Temp", 10.0)
+		testReading1 := NewReading(aTime, "Temp", 10.0)
 		wantStore := Store{
 			Names: []string{
 				"Temp",
@@ -84,7 +82,7 @@ func Test_Data_Store(t *testing.T) {
 	})
 	t.Run("Prints out contents of a reading", func(t *testing.T) {
 		store := NewStore()
-		testReading1 := NewReading(time, "Temp", 10.0)
+		testReading1 := NewReading(aTime, "Temp", 10.0)
 		store.AddReading(testReading1)
 		buffer := &bytes.Buffer{}
 
@@ -108,7 +106,7 @@ func Test_Data_Store(t *testing.T) {
 		}
 	})
 
-	// when given a "system" it should see if there is Probe with "Name" from slice of ((impklemnent this first)) names in the Store. If it finds it should create a reading and append to the store. if no names are found it should warn  data imported.
+	//NEXT TEST when given a "system" it should see if there is Probe with "Name" from slice of ((impklemnent this first)) names in the Store. If it finds it should create a reading and append to the store. if no names are found it should warn  data imported.
 }
 
 func assertStore(t *testing.T, got Store, want Store) {
