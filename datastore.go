@@ -1,4 +1,4 @@
-package main
+package data_storage
 
 import (
 	"errors"
@@ -17,6 +17,7 @@ type Reading struct {
 type Store struct {
 	Names    []string
 	Readings []Reading
+	time     time.Time
 }
 
 func NewStore() Store {
@@ -85,22 +86,24 @@ func (store Store) PrintReadings(out io.Writer) error {
 	return nil
 }
 
-// search through System for names in store and return the names (to generate readings for update)
+// search through System for names in store and return the names of items updated
 func (store *Store) UpdateStore(scan System) ([]string, int, error) {
 	//	lookingName := store.Names
 	var foundNames []string
+	var lastUpdate time.Time
 	for _, lookingName := range store.Names {
 		// has to be a better way than a nested for range
-
 		for _, probeNames := range scan.Probes {
 
 			switch {
 			case lookingName == probeNames.Name:
-				//not tested yet
-				reading := NewReading(time.Now(), probeNames.Name, probeNames.Value)
-				store.AddReading(reading)
-				//tested
-				foundNames = append(foundNames, lookingName)
+				reading := NewReading(scan.Date, probeNames.Name, probeNames.Value)
+				compareTimes := reading.Time.Compare(store.time) //// t comp u return 1 if t after u
+				if compareTimes > 0 {
+					store.AddReading(reading)
+					foundNames = append(foundNames, lookingName)
+					lastUpdate = reading.Time
+				}
 			}
 		}
 	}
@@ -108,6 +111,7 @@ func (store *Store) UpdateStore(scan System) ([]string, int, error) {
 	// return built list and errors
 	//	fmt.Printf(" updating %v records\n", len(foundNames))
 	updates := len(foundNames)
+	store.time = lastUpdate
 	return foundNames, updates, nil
 }
 

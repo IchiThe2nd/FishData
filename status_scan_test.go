@@ -1,7 +1,6 @@
-package main
+package data_storage
 
 import (
-	"fmt"
 	"reflect"
 	"testing"
 	"time"
@@ -159,7 +158,7 @@ func Test_Updating_Store(t *testing.T) {
 		_, _, err = aStore.UpdateStore(aNewScan)
 		want := 1 //should be on probe reading added temp.
 		got := len(aStore.Readings)
-		fmt.Printf(" reading is %v", aStore.Readings)
+		//fmt.Printf(" reading is %v", aStore.Readings)
 		assertMatching(t, got, want)
 		assertNoError(t, err)
 	})
@@ -175,7 +174,7 @@ func Test_Updating_Store(t *testing.T) {
 		_, _, err = aStore.UpdateStore(aNewScan)
 		want := 1 //should be on probe reading added temp.
 		got := len(aStore.Readings)
-		fmt.Printf(" reading is %v", aStore.Readings)
+		//	fmt.Printf(" reading is %v", aStore.Readings)
 		assertMatching(t, got, want)
 		assertNoError(t, err)
 	})
