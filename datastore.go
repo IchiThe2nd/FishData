@@ -51,7 +51,6 @@ func (store *Store) AddTrackedNames(newName string) (Store, error) {
 			store.Names = append(store.Names, newName)
 		}
 	}
-
 	return *store, nil
 }
 
@@ -107,16 +106,14 @@ func (store *Store) UpdateStore(scan System) ([]string, int, error) {
 			}
 		}
 	}
-
-	// return built list and errors
-	//	fmt.Printf(" updating %v records\n", len(foundNames))
 	updates := len(foundNames)
 	store.time = lastUpdate
 	return foundNames, updates, nil
 }
 
+/*
+probably better to incorporatr into update store as a flag if []reading is empty
 func (store *Store) UpdateAllStore(scan System) ([]string, int, error) {
-	//	lookingName := store.Names
 	// has to be a better way than a nested for range
 	var addedNames []string
 	for _, probeNames := range scan.Probes {
@@ -124,12 +121,9 @@ func (store *Store) UpdateAllStore(scan System) ([]string, int, error) {
 		//not tested yet
 		reading := NewReading(time.Now(), probeNames.Name, probeNames.Value)
 		store.AddReading(reading)
-		//tested
 		addedNames = append(addedNames, probeNames.Name)
-
-		// return built list and errors
-		//	fmt.Printf(" updating %v records\n", len(foundNames))
 	}
 	updates := len(addedNames)
 	return addedNames, updates, nil
 }
+*/

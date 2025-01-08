@@ -76,10 +76,8 @@ func TestProbes(t *testing.T) {
 	t.Run("creates probes as found Probe", func(t *testing.T) {
 		system, _ := NewSystem(goodInput)
 		want := dummySystem.Probes
-		//fmt.Print("the test probe name is ", want[0].Name, "\n the Value is ", want[0].Value, "\n"):j
 		value := system.Probes
 		for i, value := range value {
-			//fmt.Printf("GOT Probe %d has name: %v and value %v \n", i, value.Name, value.Value)
 			if i < len(want) {
 				assertMatching(t, value.Name, want[i].Name)
 				assertMatching(t, value.Value, want[i].Value)
@@ -113,17 +111,14 @@ func TestProbes(t *testing.T) {
 }
 
 func Test_Updating_Store(t *testing.T) {
-	// check the xml for a tracked name. then makes a reading of it to update store.
 	t.Run("scan a batch of xml for tracked probe name and returns list of names updated", func(t *testing.T) {
 		temperatureStore := NewStore()
 		_, err := temperatureStore.AddTrackedNames("Temp")
 		aNewScan, _ := NewSystem(goodInput) // scan a batch of xml.
-		//go through the system and find if probe with store tracked name exists.
 		foundRecords, _, err := temperatureStore.UpdateStore(aNewScan)
 		want := []string{
 			"Temp",
 		}
-		//fmt.Printf("found records has %v'", foundRecords)
 		assertMatchingSlice(t, foundRecords, want)
 		assertNoError(t, err)
 	})
@@ -156,9 +151,8 @@ func Test_Updating_Store(t *testing.T) {
 	</probes></status>`)
 
 		_, _, err = aStore.UpdateStore(aNewScan)
-		want := 1 //should be on probe reading added temp.
+		want := 1 //should be one probe reading added temp.
 		got := len(aStore.Readings)
-		//fmt.Printf(" reading is %v", aStore.Readings)
 		assertMatching(t, got, want)
 		assertNoError(t, err)
 	})
@@ -174,7 +168,6 @@ func Test_Updating_Store(t *testing.T) {
 		_, _, err = aStore.UpdateStore(aNewScan)
 		want := 1 //should be on probe reading added temp.
 		got := len(aStore.Readings)
-		//	fmt.Printf(" reading is %v", aStore.Readings)
 		assertMatching(t, got, want)
 		assertNoError(t, err)
 	})
