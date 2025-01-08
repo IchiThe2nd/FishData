@@ -85,14 +85,47 @@ func (store Store) PrintReadings(out io.Writer) error {
 	return nil
 }
 
-func (store *Store) UpdateStore(scan System) (string, error) {
-	lookingName := store.Names[0]
-	for i, probeNames := range scan.Probes {
-		if lookingName == probeNames.Name {
-			fmt.Printf("found %v at scan.Probes[%v]", lookingName, i)
-			return lookingName, nil
+// search through System for names in store and return the names (to generate readings for update)
+func (store *Store) UpdateStore(scan System) ([]string, int, error) {
+	//	lookingName := store.Names
+	var foundNames []string
+	for _, lookingName := range store.Names {
+		// has to be a better way than a nested for range
+
+		for _, probeNames := range scan.Probes {
+
+			switch {
+			case lookingName == probeNames.Name:
+				//not tested yet
+				reading := NewReading(time.Now(), probeNames.Name, probeNames.Value)
+				store.AddReading(reading)
+				//tested
+				foundNames = append(foundNames, lookingName)
+			}
 		}
 	}
-	fmt.Printf("\nlooking for %v\n", lookingName)
-	return "", nil
+
+	// return built list and errors
+	//	fmt.Printf(" updating %v records\n", len(foundNames))
+	updates := len(foundNames)
+	return foundNames, updates, nil
+}
+
+func (store *Store) UpdateAllStore(scan System) ([]string, int, error) {
+	//	lookingName := store.Names
+	// has to be a better way than a nested for range
+	var addedNames []string
+	for _, probeNames := range scan.Probes {
+
+		//not tested yet
+		reading := NewReading(time.Now(), probeNames.Name, probeNames.Value)
+		store.AddReading(reading)
+		//tested
+		addedNames = append(addedNames, probeNames.Name)
+
+		// return built list and errors
+		//	fmt.Printf(" updating %v records\n", len(foundNames))
+	}
+	updates := len(addedNames)
+	return addedNames, updates, nil
 }

@@ -29,6 +29,7 @@ func NewSystem(input string) (System, error) { //this is prroabbly name wrong no
 	err := xml.Unmarshal([]byte(input), &system)
 	if err != nil {
 		fmt.Println(err)
+		return system, err
 	}
 
 	if system.Hostname == "" {

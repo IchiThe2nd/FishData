@@ -1,14 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 	"time"
 )
 
 const goodInput = `This XML file does not appear to have any style information associated with it. The document tree is shown below.<status software="5.12_8H24" hardware="1.0"><hostname>Diva</hostname><serial>AC5:66625</serial><timezone>-8.00</timezone><date>01/03/2025 10:55:57</date><probes><probe><name>Temp</name><value>79.4 </value><type>Temp</type></probe><probe><name>Dis_pH</name><value>8.23 </value><type>pH</type></probe><probe><name>ORP</name><value>429 </value><type>ORP</type></probe><probe><name>Salt</name><value>32.6 </value><type>Cond</type></probe><probe><name>ReturnA</name><value>1.0 </value></probe><probe><name>T5lightsA</name><value>1.0 </value></probe><probe><name>TurfScrubberA</name><value>0.0 </value></probe><probe><name>Chiller_48A</name><value>0.0 </value></probe><probe><name>Co2A</name><value>0.0 </value></probe><probe><name>Heaters_2_6A</name><value>0.0 </value></probe><probe><name>ACfeedA</name><value>0.4 </value></probe><probe><name>Skimmer_8A</name><value>0.2 </value></probe><probe><name>ReturnW</name><value> 84 </value></probe><probe><name>T5lightsW</name><value> 114 </value></probe><probe><name>TurfScrubberW</name><value> 1 </value></probe><probe><name>Chiller_48W</name><value> 1 </value></probe><probe><name>Co2W</name><value> 1 </value></probe><probe><name>Heaters_2_6W</name><value> 1 </value></probe>
-	
-	
 	</probes></status>`
 
 func TestProbes(t *testing.T) {
@@ -116,26 +115,73 @@ func TestProbes(t *testing.T) {
 
 func Test_Updating_Store(t *testing.T) {
 	// check the xml for a tracked name. then makes a reading of it to update store.
-	t.Run("scan a batch of xml for tracked probe names", func(t *testing.T) {
+	t.Run("scan a batch of xml for tracked probe name and returns list of names updated", func(t *testing.T) {
 		temperatureStore := NewStore()
-
 		_, err := temperatureStore.AddTrackedNames("Temp")
-		temperatureStore.AddTrackedNames("Nopt Tesmp")
-		if err != nil {
-			t.Errorf("Got an Err %v when we shouldnt have ", err)
-		}
-
 		aNewScan, _ := NewSystem(goodInput) // scan a batch of xml.
 		//go through the system and find if probe with store tracked name exists.
-		foundOne, err := temperatureStore.UpdateStore(aNewScan)
-		if foundOne == "" {
-			t.Errorf(" Did not find a teh probe %v in the store but should havej", temperatureStore.Names[0])
+		foundRecords, _, err := temperatureStore.UpdateStore(aNewScan)
+		want := []string{
+			"Temp",
 		}
+		//fmt.Printf("found records has %v'", foundRecords)
+		assertMatchingSlice(t, foundRecords, want)
+		assertNoError(t, err)
 	})
 
+	t.Run("finds multiple tracked names to update", func(t *testing.T) {
+		aStore := NewStore()
+		aStore, err := aStore.AddTrackedNames("Temp")
+		aStore, err = aStore.AddTrackedNames("ORP")
+		want := []string{
+			"Temp",
+			"ORP",
+		}
+		wantQty := 2
+		aNewScan, err := NewSystem(`<status software="5.12_8H24" hardware="1.0"><hostname>Diva</hostname><serial>AC5:66625</serial><timezone>-8.00</timezone><date>01/03/2025 10:55:57</date><probes>
+		<probe><name>Temp</name><value>79.4 </value><type>Temp</type></probe>
+		<probe><name>Dis_pH</name><value>8.23 </value><type>pH</type></probe>
+		<probe><name>ORP</name><value>429 </value><type>ORP</type></probe>
+	</probes></status>`)
+		got, gotQty, err := aStore.UpdateStore(aNewScan)
+		assertMatching(t, gotQty, wantQty)
+		assertNoError(t, err)
+		assertMatchingSlice(t, got, want)
+	})
+	t.Run("a reading is added during update", func(t *testing.T) {
+		aStore := NewStore()
+		aStore, err := aStore.AddTrackedNames("Temp")
+
+		aNewScan, err := NewSystem(`<status software="5.12_8H24" hardware="1.0"><hostname>Diva</hostname><serial>AC5:66625</serial><timezone>-8.00</timezone><date>01/03/2025 10:55:57</date><probes>
+		<probe><name>Temp</name><value>79.4 </value><type>Temp</type></probe>
+	</probes></status>`)
+
+		_, _, err = aStore.UpdateStore(aNewScan)
+		want := 1 //should be on probe reading added temp.
+		got := len(aStore.Readings)
+		fmt.Printf(" reading is %v", aStore.Readings)
+		assertMatching(t, got, want)
+		assertNoError(t, err)
+	})
+	t.Run("a duplicate reading is NOT added during update", func(t *testing.T) {
+		aStore := NewStore()
+		aStore, err := aStore.AddTrackedNames("Temp")
+
+		aNewScan, err := NewSystem(`<status software="5.12_8H24" hardware="1.0"><hostname>Diva</hostname><serial>AC5:66625</serial><timezone>-8.00</timezone><date>01/03/2025 10:55:57</date><probes>
+		<probe><name>Temp</name><value>79.4 </value><type>Temp</type></probe>
+	</probes></status>`)
+
+		_, _, err = aStore.UpdateStore(aNewScan)
+		_, _, err = aStore.UpdateStore(aNewScan)
+		want := 1 //should be on probe reading added temp.
+		got := len(aStore.Readings)
+		fmt.Printf(" reading is %v", aStore.Readings)
+		assertMatching(t, got, want)
+		assertNoError(t, err)
+	})
 }
 
-// yup this was a bad idea.
+// Helper functions
 func assertMatching(t *testing.T, got any, want any) {
 	t.Helper()
 	if got != want {
@@ -147,6 +193,20 @@ func assertMatchingTypes(t *testing.T, got any, want any) {
 	t.Helper()
 	if reflect.TypeOf(got) != reflect.TypeOf(want) {
 		t.Errorf("%v and %v do not have same type", got, want)
+	}
+}
+
+func assertMatchingSlice(t *testing.T, got []string, want []string) {
+	t.Helper()
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("got %v is not DeepEqual with %v", got, want)
+	}
+}
+
+func assertNoError(t *testing.T, err error) {
+	t.Helper()
+	if err != nil {
+		t.Errorf("recieved unexpected Error %v\n", err)
 	}
 }
 

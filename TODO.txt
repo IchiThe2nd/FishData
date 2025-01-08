@@ -1,0 +1,6 @@
+Things to do / implement
+
+additional error handling (NewScan, )
+AddTrackedNames ( change to variadic function to add multiples? (mostly to mess with things as th is function shouldnt be a frequent call))
+
+newSystem should error out if bad xml recieved.
