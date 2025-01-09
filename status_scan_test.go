@@ -9,8 +9,6 @@ import (
 const goodInput = `This XML file does not appear to have any style information associated with it. The document tree is shown below.<status software="5.12_8H24" hardware="1.0"><hostname>Diva</hostname><serial>AC5:66625</serial><timezone>-8.00</timezone><date>01/03/2025 10:55:57</date><probes><probe><name>Temp</name><value>79.4 </value><type>Temp</type></probe><probe><name>Dis_pH</name><value>8.23 </value><type>pH</type></probe><probe><name>ORP</name><value>429 </value><type>ORP</type></probe><probe><name>Salt</name><value>32.6 </value><type>Cond</type></probe><probe><name>ReturnA</name><value>1.0 </value></probe><probe><name>T5lightsA</name><value>1.0 </value></probe><probe><name>TurfScrubberA</name><value>0.0 </value></probe><probe><name>Chiller_48A</name><value>0.0 </value></probe><probe><name>Co2A</name><value>0.0 </value></probe><probe><name>Heaters_2_6A</name><value>0.0 </value></probe><probe><name>ACfeedA</name><value>0.4 </value></probe><probe><name>Skimmer_8A</name><value>0.2 </value></probe><probe><name>ReturnW</name><value> 84 </value></probe><probe><name>T5lightsW</name><value> 114 </value></probe><probe><name>TurfScrubberW</name><value> 1 </value></probe><probe><name>Chiller_48W</name><value> 1 </value></probe><probe><name>Co2W</name><value> 1 </value></probe><probe><name>Heaters_2_6W</name><value> 1 </value></probe>
 	</probes></status>`
 
-//checking giasasdft
-
 func TestProbes(t *testing.T) {
 
 	dummyScan := Scan{
