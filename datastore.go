@@ -85,8 +85,8 @@ func (store Store) PrintReadings(out io.Writer) error {
 	return nil
 }
 
-// search through System for names in store and return the names of items updated
-func (store *Store) UpdateStore(scan System) ([]string, int, error) {
+// search through Scan for names in store and return the names of items updated
+func (store *Store) UpdateStore(scan Scan) ([]string, int, error) {
 	//	lookingName := store.Names
 	var foundNames []string
 	var lastUpdate time.Time
@@ -113,7 +113,7 @@ func (store *Store) UpdateStore(scan System) ([]string, int, error) {
 
 /*
 probably better to incorporatr into update store as a flag if []reading is empty
-func (store *Store) UpdateAllStore(scan System) ([]string, int, error) {
+func (store *Store) UpdateAllStore(scan Scan) ([]string, int, error) {
 	// has to be a better way than a nested for range
 	var addedNames []string
 	for _, probeNames := range scan.Probes {

@@ -9,9 +9,11 @@ import (
 const goodInput = `This XML file does not appear to have any style information associated with it. The document tree is shown below.<status software="5.12_8H24" hardware="1.0"><hostname>Diva</hostname><serial>AC5:66625</serial><timezone>-8.00</timezone><date>01/03/2025 10:55:57</date><probes><probe><name>Temp</name><value>79.4 </value><type>Temp</type></probe><probe><name>Dis_pH</name><value>8.23 </value><type>pH</type></probe><probe><name>ORP</name><value>429 </value><type>ORP</type></probe><probe><name>Salt</name><value>32.6 </value><type>Cond</type></probe><probe><name>ReturnA</name><value>1.0 </value></probe><probe><name>T5lightsA</name><value>1.0 </value></probe><probe><name>TurfScrubberA</name><value>0.0 </value></probe><probe><name>Chiller_48A</name><value>0.0 </value></probe><probe><name>Co2A</name><value>0.0 </value></probe><probe><name>Heaters_2_6A</name><value>0.0 </value></probe><probe><name>ACfeedA</name><value>0.4 </value></probe><probe><name>Skimmer_8A</name><value>0.2 </value></probe><probe><name>ReturnW</name><value> 84 </value></probe><probe><name>T5lightsW</name><value> 114 </value></probe><probe><name>TurfScrubberW</name><value> 1 </value></probe><probe><name>Chiller_48W</name><value> 1 </value></probe><probe><name>Co2W</name><value> 1 </value></probe><probe><name>Heaters_2_6W</name><value> 1 </value></probe>
 	</probes></status>`
 
+//checking git
+
 func TestProbes(t *testing.T) {
 
-	dummySystem := System{
+	dummyScan := Scan{
 		Hostname: "Diva",
 		Serial:   "AC5:66625",
 		Timezone: "-8.00",
@@ -32,18 +34,18 @@ func TestProbes(t *testing.T) {
 	}
 
 	t.Run("Get Hostname string from input", func(t *testing.T) {
-		want := dummySystem.Hostname
+		want := dummyScan.Hostname
 		//when
-		system, _ := NewSystem(goodInput)
-		got := system.Hostname
+		scan, _ := NewScan(goodInput)
+		got := scan.Hostname
 		assertMatching(t, got, want)
 	})
 	t.Run("Get serial on input", func(t *testing.T) {
 		//Given good input (to reduce xml chunks)
 		want := "AC5:66625"
 		//when
-		system, _ := NewSystem(goodInput)
-		got := system.Serial
+		scan, _ := NewScan(goodInput)
+		got := scan.Serial
 		//then
 		assertMatching(t, got, want)
 	})
@@ -51,8 +53,8 @@ func TestProbes(t *testing.T) {
 		//Given good input (to reduce xml chunks)
 		want := "-8.00"
 		//when
-		system, _ := NewSystem(goodInput)
-		got := system.Timezone
+		scan, _ := NewScan(goodInput)
+		got := scan.Timezone
 		//then
 		assertMatching(t, got, want)
 	})
@@ -60,23 +62,23 @@ func TestProbes(t *testing.T) {
 		//Given good input (to reduce xml chunks)
 		want := `03 Jan 25 10:55 UTC`
 		//when
-		system, _ := NewSystem(goodInput)
-		got := system.Date.Format(time.RFC822)
+		scan, _ := NewScan(goodInput)
+		got := scan.Date.Format(time.RFC822)
 		//then
 		assertMatching(t, got, want)
 	})
 
 	t.Run("Verify Probes type", func(t *testing.T) {
-		system, _ := NewSystem(goodInput)
-		got := system.Probes
+		scan, _ := NewScan(goodInput)
+		got := scan.Probes
 		//then
-		assertMatchingTypes(t, got, dummySystem.Probes)
+		assertMatchingTypes(t, got, dummyScan.Probes)
 	})
 
 	t.Run("creates probes as found Probe", func(t *testing.T) {
-		system, _ := NewSystem(goodInput)
-		want := dummySystem.Probes
-		value := system.Probes
+		scan, _ := NewScan(goodInput)
+		want := dummyScan.Probes
+		value := scan.Probes
 		for i, value := range value {
 			if i < len(want) {
 				assertMatching(t, value.Name, want[i].Name)
@@ -90,8 +92,8 @@ func TestProbes(t *testing.T) {
 	t.Run("Error if Hostname is blank", func(t *testing.T) {
 		badInput := `<status software="5.12_8H24" hardware="1.0">
 		<hostname></hostname><serial>AC5:66625</serial></status>`
-		system, err := NewSystem(badInput)
-		hostname := system.Hostname
+		scan, err := NewScan(badInput)
+		hostname := scan.Hostname
 		if err == nil {
 			t.Errorf("did not recieve err on Null Hostname, hostname is %v", hostname)
 		}
@@ -101,8 +103,8 @@ func TestProbes(t *testing.T) {
 		//not sure how to make failing case and I dont think this adds anything right now
 		badInput := `<status software="5.12_8H24" hardware="1.0">
 	<hostname></hostname><serial>AC5:66625</serial></status>`
-		system, _ := NewSystem(badInput)
-		hostname := system.Hostname
+		scan, _ := NewScan(badInput)
+		hostname := scan.Hostname
 		var correctType string
 		if reflect.TypeOf(hostname) != reflect.TypeOf(correctType) {
 			t.Errorf("Hostname converted to not a string recieved %+v", reflect.TypeOf(hostname))
@@ -114,7 +116,7 @@ func Test_Updating_Store(t *testing.T) {
 	t.Run("scan a batch of xml for tracked probe name and returns list of names updated", func(t *testing.T) {
 		temperatureStore := NewStore()
 		_, err := temperatureStore.AddTrackedNames("Temp")
-		aNewScan, _ := NewSystem(goodInput) // scan a batch of xml.
+		aNewScan, _ := NewScan(goodInput) // scan a batch of xml.
 		foundRecords, _, err := temperatureStore.UpdateStore(aNewScan)
 		want := []string{
 			"Temp",
@@ -132,7 +134,7 @@ func Test_Updating_Store(t *testing.T) {
 			"ORP",
 		}
 		wantQty := 2
-		aNewScan, err := NewSystem(`<status software="5.12_8H24" hardware="1.0"><hostname>Diva</hostname><serial>AC5:66625</serial><timezone>-8.00</timezone><date>01/03/2025 10:55:57</date><probes>
+		aNewScan, err := NewScan(`<status software="5.12_8H24" hardware="1.0"><hostname>Diva</hostname><serial>AC5:66625</serial><timezone>-8.00</timezone><date>01/03/2025 10:55:57</date><probes>
 		<probe><name>Temp</name><value>79.4 </value><type>Temp</type></probe>
 		<probe><name>Dis_pH</name><value>8.23 </value><type>pH</type></probe>
 		<probe><name>ORP</name><value>429 </value><type>ORP</type></probe>
@@ -146,7 +148,7 @@ func Test_Updating_Store(t *testing.T) {
 		aStore := NewStore()
 		aStore, err := aStore.AddTrackedNames("Temp")
 
-		aNewScan, err := NewSystem(`<status software="5.12_8H24" hardware="1.0"><hostname>Diva</hostname><serial>AC5:66625</serial><timezone>-8.00</timezone><date>01/03/2025 10:55:57</date><probes>
+		aNewScan, err := NewScan(`<status software="5.12_8H24" hardware="1.0"><hostname>Diva</hostname><serial>AC5:66625</serial><timezone>-8.00</timezone><date>01/03/2025 10:55:57</date><probes>
 		<probe><name>Temp</name><value>79.4 </value><type>Temp</type></probe>
 	</probes></status>`)
 
@@ -160,7 +162,7 @@ func Test_Updating_Store(t *testing.T) {
 		aStore := NewStore()
 		aStore, err := aStore.AddTrackedNames("Temp")
 
-		aNewScan, err := NewSystem(`<status software="5.12_8H24" hardware="1.0"><hostname>Diva</hostname><serial>AC5:66625</serial><timezone>-8.00</timezone><date>01/03/2025 10:55:57</date><probes>
+		aNewScan, err := NewScan(`<status software="5.12_8H24" hardware="1.0"><hostname>Diva</hostname><serial>AC5:66625</serial><timezone>-8.00</timezone><date>01/03/2025 10:55:57</date><probes>
 		<probe><name>Temp</name><value>79.4 </value><type>Temp</type></probe>
 	</probes></status>`)
 

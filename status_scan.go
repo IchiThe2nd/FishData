@@ -6,9 +6,9 @@ import (
 	"time"
 )
 
-const input = `<System\g><hostname>Diva</hostname></system>`
+const input = `<Scan\g><hostname>Diva</hostname></scan>`
 
-type System struct {
+type Scan struct {
 	Hostname string `xml:"hostname"`
 	Serial   string `xml:"serial"`
 	Timezone string `xml:"timezone"`
@@ -24,21 +24,21 @@ type Probe struct {
 	Type  string  `xml:"type"`
 }
 
-func NewSystem(input string) (System, error) { //this is prroabbly name wrong now change to newScan
-	var system System
-	err := xml.Unmarshal([]byte(input), &system)
+func NewScan(input string) (Scan, error) { //this is prroabbly name wrong now change to newScan
+	var scan Scan
+	err := xml.Unmarshal([]byte(input), &scan)
 	if err != nil {
 		fmt.Println(err)
-		return system, err
+		return scan, err
 	}
 
-	if system.Hostname == "" {
+	if scan.Hostname == "" {
 		err = fmt.Errorf("recieved blank value for hostname")
-		return system, err
+		return scan, err
 	}
 
-	system.Date = convTime(system.RawDate, "01/02/2006 03:04:05")
-	return system, err
+	scan.Date = convTime(scan.RawDate, "01/02/2006 03:04:05")
+	return scan, err
 }
 
 func convTime(input, layout string) time.Time {

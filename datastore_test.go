@@ -145,7 +145,7 @@ func Test_Data_Store(t *testing.T) {
 		}
 		assertStore(t, aStore, cStore) //double check pointers arent acting up
 	})
-	//NEXT TEST when given a "system" it should see if there is Probe with "Name" from slice of ((impklemnent this first)) names in the Store. If it finds it should create a reading and append to the store. if no names are found it should warn  data imported.
+	//NEXT TEST when given a "scan" it should see if there is Probe with "Name" from slice of ((impklemnent this first)) names in the Store. If it finds it should create a reading and append to the store. if no names are found it should warn  data imported.
 }
 
 func assertStore(t *testing.T, got Store, want Store) {
