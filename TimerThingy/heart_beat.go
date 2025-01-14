@@ -12,11 +12,12 @@ step 1. make a timer >> make a test for a timer pinging a ch.
 
 type updater struct {
 	frequency int
+	eternal   bool
 	// source input data we want or location
 	output io.Writer // probably going to be a write call or something later.
 }
 
-func NewUpdater(duration int, output io.Writer) updater {
+func NewUpdater(duration int, output io.Writer, eternal bool) updater {
 	updater := updater{
 		frequency: duration,
 		output:    output,
@@ -25,16 +26,15 @@ func NewUpdater(duration int, output io.Writer) updater {
 }
 
 func (u updater) Start() error {
-	//fmt.Fprint(u.output, "a") //just using a proxy for the actual update functionA
 	freq := u.frequency
-	//fmt.Printf("%d\n", freq)
-	for i := freq / 5; i > 0; i-- {
-		stoptimer := time.AfterFunc(5*time.Millisecond, u.dummyAction)
-		//fmt.Printf("%d\n", i)
-		defer stoptimer.Stop()
+
+	for range time.Tick(time.Millisecond * 5) {
+		u.dummyAction()
+		freq = freq - 5
+		if freq == 0 {
+			return nil
+		}
 	}
-	time.Sleep(30 * time.Millisecond)
-	//time.Sleep(1 * time.Second)
 	return nil
 }
 

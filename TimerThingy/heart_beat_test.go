@@ -31,11 +31,11 @@ func Test_timers_properties(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 
 			t.Parallel()
-
+			eternal := false
 			duration := test.input
 			want := test.result
 			output := &bytes.Buffer{}
-			updater := NewUpdater(duration, output)
+			updater := NewUpdater(duration, output, eternal)
 			updater.Start()
 
 			got := output.String()
