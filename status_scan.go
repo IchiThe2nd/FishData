@@ -6,8 +6,6 @@ import (
 	"time"
 )
 
-const input = `<Scan\g><hostname>Diva</hostname></scan>`
-
 type Scan struct {
 	Hostname string `xml:"hostname"`
 	Serial   string `xml:"serial"`

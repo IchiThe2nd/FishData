@@ -15,9 +15,9 @@ type Reading struct {
 }
 
 type Store struct {
-	Names    []string
-	Readings []Reading
-	time     time.Time
+	TrackedNames []string
+	Readings     []Reading
+	time         time.Time
 }
 
 func NewStore() Store {
@@ -36,11 +36,11 @@ func NewReading(t time.Time, name string, value float32) Reading {
 
 func (store *Store) AddTrackedNames(newName string) (Store, error) {
 	//  cant figure out why I have to return as a pointer with out breasking stuff
-	if len(store.Names) == 0 {
-		store.Names = append(store.Names, newName)
+	if len(store.TrackedNames) == 0 {
+		store.TrackedNames = append(store.TrackedNames, newName)
 	} else {
 		matchingNames := 0
-		for _, existingNames := range store.Names {
+		for _, existingNames := range store.TrackedNames {
 			if existingNames == newName {
 				matchingNames++
 				err := errors.New("entry already exists")
@@ -48,13 +48,15 @@ func (store *Store) AddTrackedNames(newName string) (Store, error) {
 			}
 		}
 		if matchingNames == 0 {
-			store.Names = append(store.Names, newName)
+			store.TrackedNames = append(store.TrackedNames, newName)
 		}
 	}
 	return *store, nil
 }
 
 func (store *Store) AddReading(newReading Reading) Store {
+	// upserts a reading  to its store
+
 	store.AddTrackedNames(newReading.Name)
 
 	for _, oldReadings := range store.Readings {
@@ -87,10 +89,10 @@ func (store Store) PrintReadings(out io.Writer) error {
 
 // search through Scan for names in store and return the names of items updated
 func (store *Store) UpdateStore(scan Scan) ([]string, int, error) {
-	//	lookingName := store.Names
+	//	lookingName := store.TrackedNames
 	var foundNames []string
 	var lastUpdate time.Time
-	for _, lookingName := range store.Names {
+	for _, lookingName := range store.TrackedNames {
 		// has to be a better way than a nested for range
 		for _, probeNames := range scan.Probes {
 

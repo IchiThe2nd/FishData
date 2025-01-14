@@ -27,7 +27,7 @@ func Test_Data_Store(t *testing.T) {
 			Readings: []Reading{
 				testReading1,
 			},
-			Names: []string{
+			TrackedNames: []string{
 				"Temp",
 			},
 		}
@@ -58,26 +58,26 @@ func Test_Data_Store(t *testing.T) {
 	t.Run("Store has a list for probes being tracked", func(t *testing.T) {
 		//testReading1 := NewReading(time, "Temp", 10.0)
 		want := Store{
-			Names: []string{
+			TrackedNames: []string{
 				"TrackedProbe",
 			},
 		}
 		aStore := NewStore()
 		aStore.AddTrackedNames("TrackedProbe")
 		got := aStore
-		//		fmt.Println(aStore.Names)
+		//		fmt.Println(aStore.TrackedNames)
 		assertStore(t, got, want)
 	})
-	t.Run("Adding a reading updates Names", func(t *testing.T) {
+	t.Run("Adding a reading updates TrackedNames", func(t *testing.T) {
 		wantStore := Store{
-			Names: []string{
+			TrackedNames: []string{
 				"Temp",
 			},
 		}
 		store := NewStore()
 		store.AddReading(testReading1)
-		got := store.Names[0]
-		want := wantStore.Names[0]
+		got := store.TrackedNames[0]
+		want := wantStore.TrackedNames[0]
 		assertMatching(t, got, want)
 	})
 	t.Run("does not add duplicated time readings", func(t *testing.T) {
@@ -92,17 +92,17 @@ func Test_Data_Store(t *testing.T) {
 
 	})
 	// turn this inot table test.. test adding "" ,
-	t.Run("Exisiting trackedNames do not create addition entries", func(t *testing.T) {
+	t.Run("Exisiting trackedTrackedNames do not create addition entries", func(t *testing.T) {
 		aStore := NewStore()
 		aStore.AddTrackedNames("aName")
 		aStore.AddTrackedNames("bName")
-		before := len(aStore.Names)
+		before := len(aStore.TrackedNames)
 		_, err := aStore.AddTrackedNames("aName")
 		if err == nil {
 			t.Errorf(" should have recived error on adding a duplicated name")
 			//fmt.Print(err)
 		}
-		after := len(aStore.Names)
+		after := len(aStore.TrackedNames)
 
 		if before != after {
 			t.Errorf("starting store length was %v and after adding an existing name store length was %v", before, after)
