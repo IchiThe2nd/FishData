@@ -3,6 +3,7 @@ package timerthingy // thing to schedule when to pull data from a variable sourc
 import (
 	"fmt"
 	"io"
+	"time"
 )
 
 /* a timer that checks something  every so often.
@@ -24,6 +25,20 @@ func NewUpdater(duration int, output io.Writer) updater {
 }
 
 func (u updater) Start() error {
-	fmt.Fprint(u.output, "a")
+	//fmt.Fprint(u.output, "a") //just using a proxy for the actual update functionA
+	freq := u.frequency
+	//fmt.Printf("%d\n", freq)
+	for i := freq / 5; i > 0; i-- {
+		stoptimer := time.AfterFunc(5*time.Millisecond, u.dummyAction)
+		//fmt.Printf("%d\n", i)
+		defer stoptimer.Stop()
+	}
+	time.Sleep(30 * time.Millisecond)
+	//time.Sleep(1 * time.Second)
 	return nil
+}
+
+func (u updater) dummyAction() {
+	//fmt.Println("dummyAction fired")
+	fmt.Fprint(u.output, "a") //just using a proxy for the actual update functionA
 }
